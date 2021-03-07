@@ -1,26 +1,27 @@
-const { GoogleSpreadsheet } = require("google-spreadsheet");
+const Sheet = require('./sheet');
+const fetch = require('node-fetch');
 
-// Initialize the sheet - doc ID is the long id in the sheets URL
-const doc = new GoogleSpreadsheet(
-  "1vXwk-BMcLgxYprLArD_9E7Z7GcaefBGbas4xFlrWhhw"
-);
-(async function () {
-   await doc.useServiceAccountAuth(require("./credentials.json"));
+(async function() {
+  
+  const res = await fetch(
+    "https://jobs.github.com/positions.json?description=fullstack&location=new+york"
+  );
+  const json = await res.json();
+  
+  const rows = json.map(job => {
+    return {
+      Company: job.company,
+      Title: job.title,
+      Location: job.location,
+      Date: job.created_at,
+      URL: job.url,
+    }
+  })
 
-  await doc.loadInfo(); // loads document properties and worksheets
-  console.log(doc.title);
-  await doc.updateProperties({ title: "renamed doc" });
+  const sheet = new Sheet();
+  await sheet.load();
 
-})();
+  await sheet.addRows(rows);
 
- 
-// Initialize Auth - see more available options at https://theoephraim.github.io/node-google-spreadsheet/#/getting-started/authentication
-
-
-// const sheet = doc.sheetsByIndex[0]; // or use doc.sheetsById[id] or doc.sheetsByTitle[title]
-// console.log(sheet.title);
-// console.log(sheet.rowCount);
-
-// // adding / removing sheets
-// const newSheet = await doc.addSheet({ title: "hot new sheet!" });
-// await newSheet.delete();
+  //console.log({json})
+})()
