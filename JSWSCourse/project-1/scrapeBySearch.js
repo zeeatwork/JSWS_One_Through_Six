@@ -3,7 +3,7 @@ const fetch = require("node-fetch");
 
 (async function () {
   const res = await fetch(
-    "https://jobs.github.com/positions.json?description=node&location=remote"
+    "https://jobs.github./positions.json?description=node&location=remote"
   );
   const json = await res.json();
 
